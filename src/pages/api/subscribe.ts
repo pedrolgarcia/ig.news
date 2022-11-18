@@ -13,7 +13,7 @@ type User = {
   }
 }
 
-const subcribe = async (req: NextApiRequest, res: NextApiResponse) => {
+export default async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST')
     res.status(405).end('Method now allowed')
@@ -61,5 +61,3 @@ const subcribe = async (req: NextApiRequest, res: NextApiResponse) => {
 
   return res.status(200).json({ sessionId: stripeCheckoutSession.id })
 }
-
-export default subcribe
