@@ -10,6 +10,7 @@ declare global {
       GITHUB_CLIENT_SECRET: string
       FAUNADB_KEY: string
       PRISMIC_ACCESS_TOKEN: string
+      PRISMIC_ENDPOINT: string
     }
   }
 }
