@@ -5,8 +5,20 @@ import Prismic from '@prismicio/client'
 import styles from './styles.module.scss'
 
 import { getPrismicClient } from '../../services/prismic'
+import { RichText } from 'prismic-dom'
 
-export default function Posts() {
+type Post = {
+  slug: string
+  title: string
+  excerpt: string
+  updatedAt: string
+}
+
+interface PostsProps {
+  posts: Post[]
+}
+
+export default function Posts({ posts }: PostsProps) {
   return (
     <>
       <Head>
@@ -15,56 +27,13 @@ export default function Posts() {
 
       <main className={styles.container}>
         <div className={styles.posts}>
-          <a href="">
-            <time>12 de março de 2021</time>
-            <strong>Creating a monorepo with lerna</strong>
-            <p>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit.
-              Recusandae repellendus officiis necessitatibus, exercitationem rem
-              debitis corrupti possimus assumenda quis provident quasi sunt,
-              expedita consequatur. Officiis quae esse quia consectetur minus.
-            </p>
-          </a>
-          <a href="">
-            <time>12 de março de 2021</time>
-            <strong>Creating a monorepo with lerna</strong>
-            <p>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit.
-              Recusandae repellendus officiis necessitatibus, exercitationem rem
-              debitis corrupti possimus assumenda quis provident quasi sunt,
-              expedita consequatur. Officiis quae esse quia consectetur minus.
-            </p>
-          </a>
-          <a href="">
-            <time>12 de março de 2021</time>
-            <strong>Creating a monorepo with lerna</strong>
-            <p>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit.
-              Recusandae repellendus officiis necessitatibus, exercitationem rem
-              debitis corrupti possimus assumenda quis provident quasi sunt,
-              expedita consequatur. Officiis quae esse quia consectetur minus.
-            </p>
-          </a>
-          <a href="">
-            <time>12 de março de 2021</time>
-            <strong>Creating a monorepo with lerna</strong>
-            <p>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit.
-              Recusandae repellendus officiis necessitatibus, exercitationem rem
-              debitis corrupti possimus assumenda quis provident quasi sunt,
-              expedita consequatur. Officiis quae esse quia consectetur minus.
-            </p>
-          </a>
-          <a href="">
-            <time>12 de março de 2021</time>
-            <strong>Creating a monorepo with lerna</strong>
-            <p>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit.
-              Recusandae repellendus officiis necessitatibus, exercitationem rem
-              debitis corrupti possimus assumenda quis provident quasi sunt,
-              expedita consequatur. Officiis quae esse quia consectetur minus.
-            </p>
-          </a>
+          {posts.map((post) => (
+            <a key={post.slug} href="">
+              <time>{post.updatedAt}</time>
+              <strong>{post.title}</strong>
+              <p>{post.excerpt}</p>
+            </a>
+          ))}
         </div>
       </main>
     </>
@@ -82,9 +51,28 @@ export const getStaticProps: GetStaticProps = async () => {
     },
   )
 
-  console.log(JSON.stringify(response, null, 2))
+  const posts = response.results.map((post: any) => {
+    return {
+      slug: post.uid,
+      title: RichText.asText(post.data?.title),
+      excerpt:
+        post.data?.content?.find(
+          (content: any) => content.type == 'paragraph' && content.text != '',
+        )?.text ?? '',
+      updatedAt: new Date(post.last_publication_date).toLocaleDateString(
+        'pt-BR',
+        {
+          day: '2-digit',
+          month: 'long',
+          year: 'numeric',
+        },
+      ),
+    }
+  })
 
   return {
-    props: {},
+    props: {
+      posts,
+    },
   }
 }
